@@ -1,0 +1,227 @@
+html_content = """<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelo de Caja - Estándar DevTools</title>
+    <style>
+        :root {
+            /* Colores estandarizados de Chrome DevTools */
+            --color-margin: #f9cc9d;
+            --color-border: #fde098;
+            --color-padding: #c3d08b;
+            --color-content: #8cb2d0;
+            
+            /* Colores inactivos (escala de grises para el contraste inicial) */
+            --bg-margin-inactive: #3a3a3a;
+            --bg-border-inactive: #4a4a4a;
+            --bg-padding-inactive: #5a5a5a;
+            --bg-content-inactive: #6a6a6a;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            background-color: #242424; /* Fondo oscuro típico de DevTools */
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .header-text {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header-text h2 { margin-bottom: 10px; font-weight: 500; letter-spacing: 1px; }
+        .header-text p { color: #aaa; font-size: 0.9rem; }
+
+        /* Ocultar checkboxes (Checkbox Hack) */
+        input[type="checkbox"] { display: none; }
+
+        /* Botones de Control */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #333;
+            color: #ddd;
+            border: 1px solid #555;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 600;
+            user-select: none;
+        }
+
+        .btn:hover { background-color: #444; }
+
+        /* --- Estructura del Diagrama (Estilo DevTools) --- */
+        .diagram-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            font-family: Consolas, monospace; /* Fuente monoespaciada para los números */
+        }
+
+        .box {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.4s ease;
+        }
+
+        /* Dimensiones y bordes de cada capa para simular el inspector */
+        .margin-box { 
+            padding: 40px; 
+            background-color: var(--bg-margin-inactive); 
+            border: 1px dashed #000; 
+        }
+        
+        .border-box { 
+            padding: 30px; 
+            background-color: var(--bg-border-inactive); 
+            border: 1px solid #000; 
+        }
+        
+        .padding-box { 
+            padding: 40px; 
+            background-color: var(--bg-padding-inactive); 
+            border: 1px dashed #000; 
+        }
+        
+        .content-box {
+            padding: 20px 40px;
+            background-color: var(--bg-content-inactive);
+            border: 1px solid #000;
+            color: #fff;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 150px;
+        }
+
+        /* Nombres de las capas (esquina superior izquierda) */
+        .tag {
+            position: absolute;
+            top: 2px;
+            left: 6px;
+            font-size: 11px;
+            color: #fff;
+            opacity: 0.7;
+        }
+
+        /* Números de las dimensiones */
+        .dim {
+            position: absolute;
+            font-size: 12px;
+            color: #fff;
+            opacity: 0.8;
+        }
+        
+        /* Posicionamiento de los números */
+        .dim.top { top: 10px; left: 50%; transform: translateX(-50%); }
+        .dim.bottom { bottom: 10px; left: 50%; transform: translateX(-50%); }
+        .dim.left { left: 10px; top: 50%; transform: translateY(-50%); }
+        .dim.right { right: 10px; top: 50%; transform: translateY(-50%); }
+
+        /* --- Lógica de Colores al Activar Checkboxes --- */
+        
+        /* Margin */
+        #check-margin:checked ~ .controls label[for="check-margin"] { background-color: var(--color-margin); color: #000; border-color: var(--color-margin); }
+        #check-margin:checked ~ .diagram-container .margin-box { background-color: var(--color-margin); }
+        #check-margin:checked ~ .diagram-container .margin-box > .tag,
+        #check-margin:checked ~ .diagram-container .margin-box > .dim { color: #000; opacity: 1; }
+
+        /* Border */
+        #check-border:checked ~ .controls label[for="check-border"] { background-color: var(--color-border); color: #000; border-color: var(--color-border); }
+        #check-border:checked ~ .diagram-container .border-box { background-color: var(--color-border); }
+        #check-border:checked ~ .diagram-container .border-box > .tag,
+        #check-border:checked ~ .diagram-container .border-box > .dim { color: #000; opacity: 1; }
+
+        /* Padding */
+        #check-padding:checked ~ .controls label[for="check-padding"] { background-color: var(--color-padding); color: #000; border-color: var(--color-padding); }
+        #check-padding:checked ~ .diagram-container .padding-box { background-color: var(--color-padding); }
+        #check-padding:checked ~ .diagram-container .padding-box > .tag,
+        #check-padding:checked ~ .diagram-container .padding-box > .dim { color: #000; opacity: 1; }
+
+        /* Content */
+        #check-content:checked ~ .controls label[for="check-content"] { background-color: var(--color-content); color: #000; border-color: var(--color-content); }
+        #check-content:checked ~ .diagram-container .content-box { background-color: var(--color-content); color: #000; }
+
+    </style>
+</head>
+<body>
+
+    <div class="header-text">
+        <h2>Inspector de Modelo de Caja (Estilo DevTools)</h2>
+        <p>Selecciona las capas para visualizar los colores estándar de la industria y sus dimensiones.</p>
+    </div>
+
+    <!-- Checkboxes ocultos -->
+    <input type="checkbox" id="check-margin">
+    <input type="checkbox" id="check-border">
+    <input type="checkbox" id="check-padding">
+    <input type="checkbox" id="check-content">
+
+    <!-- Botones interactivos -->
+    <div class="controls">
+        <label class="btn" for="check-margin">Margin</label>
+        <label class="btn" for="check-border">Border</label>
+        <label class="btn" for="check-padding">Padding</label>
+        <label class="btn" for="check-content">Content</label>
+    </div>
+
+    <!-- Diagrama -->
+    <div class="diagram-container">
+        <!-- MARGIN -->
+        <div class="box margin-box">
+            <span class="tag">margin</span>
+            <span class="dim top">50</span>
+            <span class="dim bottom">50</span>
+            <span class="dim left">50</span>
+            <span class="dim right">50</span>
+
+            <!-- BORDER -->
+            <div class="box border-box">
+                <span class="tag">border</span>
+                <span class="dim top">5</span>
+                <span class="dim bottom">5</span>
+                <span class="dim left">5</span>
+                <span class="dim right">5</span>
+
+                <!-- PADDING -->
+                <div class="box padding-box">
+                    <span class="tag">padding</span>
+                    <span class="dim top">20</span>
+                    <span class="dim bottom">20</span>
+                    <span class="dim left">20</span>
+                    <span class="dim right">20</span>
+
+                    <!-- CONTENT -->
+                    <div class="box content-box">
+                        744 × 72
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

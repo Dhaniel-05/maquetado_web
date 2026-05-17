@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Modelo de Caja - Avanzado</title>
+    <style>
+        :root {
+            /* Colores oficiales de Chrome DevTools */
+            --color-margin: #f9cc9d;
+            --color-border: #fde098;
+            --color-padding: #c3d08b;
+            --color-content: #8cb2d0;
+            --color-inactive: #f0f0f0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #ffffff; /* Fondo blanco solicitado */
+            color: #333;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Panel Superior de Controles */
+        header {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .control-item:hover { background: #eee; }
+        
+        /* Workspace */
+        #workspace {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 50px;
+        }
+
+        /* --- Estructura del Modelo de Caja --- */
+        .box-wrapper {
+            position: relative;
+            transition: background-color 0.3s;
+        }
+
+        .layer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        /* Margin Layer */
+        #margin-layer { padding: 40px; background-color: var(--color-inactive); }
+        #margin-layer.active { background-color: var(--color-margin); }
+
+        /* Border Layer */
+        #border-layer { padding: 5px; background-color: var(--color-inactive); }
+        #border-layer.active { background-color: var(--color-border); }
+
+        /* Padding Layer */
+        #padding-layer { padding: 30px; background-color: var(--color-inactive); }
+        #padding-layer.active { background-color: var(--color-padding); }
+
+        /* Content Layer */
+        #content-layer {
+            background-color: var(--color-inactive);
+            min-width: 100px;
+            min-height: 80px;
+            width: 300px;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 16px;
+            color: #444;
+        }
+        #content-layer.active { background-color: var(--color-content); }
+
+        /* Etiquetas de texto */
+        .layer-label {
+            position: absolute;
+            top: 4px;
+            left: 6px;
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Manejadores de Redimensionamiento (Resizers) */
+        .resizer {
+            position: absolute;
+            background: rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .resizer.r { top: 0; right: 0; width: 10px; height: 100%; cursor: col-resize; }
+        .resizer.b { bottom: 0; left: 0; width: 100%; height: 100px; cursor: row-resize; height: 10px; }
+        .resizer.rb { right: 0; bottom: 0; width: 15px; height: 15px; cursor: nwse-resize; background: #555; border-radius: 2px; }
+        
+        /* Dimensiones flotantes */
+        .dim-text {
+            position: absolute;
+            font-size: 11px;
+            font-family: monospace;
+            pointer-events: none;
+        }
+        .dim-v { top: 50%; left: 10px; transform: translateY(-50%); }
+        .dim-h { top: 10px; left: 50%; transform: translateX(-50%); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="text-align: center">
+            <h2 style="font-weight: 500; font-size: 1.2rem;">Simulador Interactivo del Modelo de Caja</h2>
+            <p style="font-size: 0.85rem; color: #666;">Haz clic en los checkboxes para activar las capas y arrastra desde el borde derecho o inferior para redimensionar.</p>
+        </div>
+        <div class="controls">
+            <label class="control-item">
+                <input type="checkbox" id="toggle-margin"> Margin
+            </label>
+            <label class="control-item">
+                <input type="checkbox" id="toggle-border"> Border
+            </label>
+            <label class="control-item">
+                <input type="checkbox" id="toggle-padding"> Padding
+            </label>
+            <label class="control-item">
+                <input type="checkbox" id="toggle-content" checked> Content
+            </label>
+        </div>
+    </header>
+
+    <main id="workspace">
+        <!-- El Modelo de Caja -->
+        <div id="margin-layer" class="layer">
+            <span class="layer-label">margin</span>
+            <span class="dim-text dim-h">40</span>
+            <span class="dim-text dim-v">40</span>
+            
+            <div id="border-layer" class="layer">
+                <span class="layer-label">border</span>
+                <span class="dim-text dim-h">5</span>
+                <span class="dim-text dim-v">5</span>
+                
+                <div id="padding-layer" class="layer">
+                    <span class="layer-label">padding</span>
+                    <span class="dim-text dim-h">30</span>
+                    <span class="dim-text dim-v">30</span>
+                    
+                    <div id="content-layer" class="layer active">
+                        <span id="content-dim-text">300 x 150</span>
+                        
+                        <!-- Manejadores para redimensionar -->
+                        <div class="resizer r"></div>
+                        <div class="resizer b"></div>
+                        <div class="resizer rb"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Selección de elementos
+        const contentLayer = document.getElementById('content-layer');
+        const contentDimDisplay = document.getElementById('content-dim-text');
+        
+        const toggles = {
+            margin: document.getElementById('toggle-margin'),
+            border: document.getElementById('toggle-border'),
+            padding: document.getElementById('toggle-padding'),
+            content: document.getElementById('toggle-content')
+        };
+
+        const layers = {
+            margin: document.getElementById('margin-layer'),
+            border: document.getElementById('border-layer'),
+            padding: document.getElementById('padding-layer'),
+            content: document.getElementById('content-layer')
+        };
+
+        // Lógica de Checkboxes
+        Object.keys(toggles).forEach(key => {
+            toggles[key].addEventListener('change', () => {
+                if (toggles[key].checked) {
+                    layers[key].classList.add('active');
+                } else {
+                    layers[key].classList.remove('active');
+                }
+            });
+        });
+
+        // Lógica de Redimensionamiento (Resize)
+        let isResizing = false;
+        let currentResizer = null;
+
+        const resizers = document.querySelectorAll('.resizer');
+
+        resizers.forEach(resizer => {
+            resizer.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                currentResizer = resizer;
+                document.body.style.cursor = window.getComputedStyle(resizer).cursor;
+                e.preventDefault();
+            });
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+
+            const rect = contentLayer.getBoundingClientRect();
+
+            if (currentResizer.classList.contains('r')) {
+                const width = e.clientX - rect.left;
+                if (width > 50) contentLayer.style.width = width + 'px';
+            } 
+            else if (currentResizer.classList.contains('b')) {
+                const height = e.clientY - rect.top;
+                if (height > 50) contentLayer.style.height = height + 'px';
+            }
+            else if (currentResizer.classList.contains('rb')) {
+                const width = e.clientX - rect.left;
+                const height = e.clientY - rect.top;
+                if (width > 50) contentLayer.style.width = width + 'px';
+                if (height > 50) contentLayer.style.height = height + 'px';
+            }
+
+            updateDimensionText();
+        });
+
+        window.addEventListener('mouseup', () => {
+            isResizing = false;
+            document.body.style.cursor = 'default';
+        });
+
+        function updateDimensionText() {
+            const w = Math.round(contentLayer.offsetWidth);
+            const h = Math.round(contentLayer.offsetHeight);
+            contentDimDisplay.innerText = `${w} x ${h}`;
+        }
+
+        // Inicializar texto
+        updateDimensionText();
+
+    </script>
+</body>
+</html>

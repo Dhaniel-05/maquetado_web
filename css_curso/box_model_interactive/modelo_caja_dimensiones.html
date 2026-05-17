@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelo de Caja CSS - Interactivo</title>
+    <style>
+        :root {
+            /* variables de colores y estándares de dev tools */
+            --color-margin: #f9cc9d; /* Naranja/Durazno */
+            --color-border: #000000; /* Negro */
+            --color-padding: #87ceeb; /* Celeste */
+            --color-content: #0000ff; /* Azul */
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px 20px;
+            background-color: #f8f9fa;
+        }
+
+        .header-text {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header-text h2 { color: #2c3e50; margin-bottom: 10px; font-size: 2rem;}
+        .header-text p { color: #555; }
+
+        /* Ocultar checkboxes reales (Técnica "Checkbox Hack") */
+        input[type="checkbox"] { display: none; }
+
+        /* Contenedor de Botones (Labels interactivos) */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 50px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            background-color: #fff;
+            color: #444;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            user-select: none;
+        }
+
+        /* Cuadrito indicador dentro del botón */
+        .btn::before {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #aaa;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        /* --- Estilos cuando los checkboxes están activados --- */
+        
+        #check-margin:checked ~ .controls label[for="check-margin"] { background-color: var(--color-margin); border-color: #d35400; color: #000; }
+        #check-margin:checked ~ .controls label[for="check-margin"]::before { background-color: #d35400; border-color: #d35400; }
+
+        #check-border:checked ~ .controls label[for="check-border"] { background-color: var(--color-border); border-color: #000; color: #fff; }
+        #check-border:checked ~ .controls label[for="check-border"]::before { background-color: #fff; border-color: #fff; }
+
+        #check-padding:checked ~ .controls label[for="check-padding"] { background-color: var(--color-padding); border-color: #2980b9; color: #000; }
+        #check-padding:checked ~ .controls label[for="check-padding"]::before { background-color: #2980b9; border-color: #2980b9; }
+
+        #check-content:checked ~ .controls label[for="check-content"] { background-color: var(--color-content); border-color: #000080; color: #fff; }
+        #check-content:checked ~ .controls label[for="check-content"]::before { background-color: #fff; border-color: #fff; }
+
+
+        /* --- Contenedor Principal del Demo Visual --- */
+        .box-demo {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* Capas anidadas que simulan el modelo de caja */
+        .layer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        /* Etiquetas flotantes en cada capa (Margin, Padding, etc.) */
+        .layer::after {
+            content: attr(data-name);
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            font-size: 13px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            letter-spacing: 1px;
+        }
+
+        /* Dimensiones base (estado inactivo) */
+        .margin-layer {
+            padding: 50px;
+            background-color: transparent;
+            border: 2px dashed #ccc;
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .border-layer {
+            padding: 15px;
+            background-color: transparent;
+            border: 2px dashed #ccc;
+            width: 100%;
+        }
+
+        .padding-layer {
+            padding: 50px;
+            background-color: transparent;
+            border: 2px dashed #ccc;
+            width: 100%;
+        }
+
+        .content-layer {
+            padding: 30px;
+            background-color: #e9ecef; /* Color base grisáceo */
+            border: 2px dashed #ccc;
+            width: 100%;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 900;
+            color: #333;
+            min-height: 150px;
+            letter-spacing: 2px;
+        }
+
+        /* --- Reacciones visuales en las cajas basadas en los checkboxes --- */
+        
+        #check-margin:checked ~ .box-demo .margin-layer {
+            background-color: var(--color-margin);
+            border: 2px solid #d35400;
+        }
+        #check-margin:checked ~ .box-demo .margin-layer::after { opacity: 1; color: #d35400; }
+
+        #check-border:checked ~ .box-demo .border-layer {
+            background-color: var(--color-border);
+            border: 2px solid #000;
+        }
+        #check-border:checked ~ .box-demo .border-layer::after { opacity: 1; color: #fff; }
+
+        #check-padding:checked ~ .box-demo .padding-layer {
+            background-color: var(--color-padding);
+            border: 2px solid #2980b9;
+        }
+        #check-padding:checked ~ .box-demo .padding-layer::after { opacity: 1; color: #154360; }
+
+        #check-content:checked ~ .box-demo .content-layer {
+            background-color: var(--color-content);
+            border: 2px solid #000080;
+            color: #fff;
+        }
+        #check-content:checked ~ .box-demo .content-layer::after { opacity: 1; color: #fff; }
+
+    </style>
+</head>
+<body>
+
+    <div class="header-text">
+        <h2>Explicación del Modelo de Caja</h2>
+        <p>Activa los controles para revelar cómo cada propiedad se distribuye alrededor del elemento principal.</p>
+    </div>
+
+    <!-- Checkboxes (Lógica de estado puramente en CSS) -->
+    <input type="checkbox" id="check-margin">
+    <input type="checkbox" id="check-border">
+    <input type="checkbox" id="check-padding">
+    <input type="checkbox" id="check-content">
+
+    <!-- Botones UI (vinculados a los checkboxes por el atributo 'for') -->
+    <div class="controls">
+        <label for="check-margin" class="btn">Margin (Margen)</label>
+        <label for="check-border" class="btn">Border (Borde)</label>
+        <label for="check-padding" class="btn">Padding (Relleno)</label>
+        <label for="check-content" class="btn">Content (Contenido)</label>
+    </div>
+
+    <!-- Contenedor Visual de Capas -->
+    <div class="box-demo">
+        <!-- El div más exterior representa el Margen -->
+        <div class="layer margin-layer" data-name="Margin">
+            <!-- Dentro del margen está el Borde -->
+            <div class="layer border-layer" data-name="Border">
+                <!-- Dentro del borde está el Padding -->
+                <div class="layer padding-layer" data-name="Padding">
+                    <!-- Y en el centro, el Contenido real -->
+                    <div class="layer content-layer" data-name="Content">
+                        CONTENIDO
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
