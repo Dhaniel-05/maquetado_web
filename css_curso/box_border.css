@@ -1,0 +1,32 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+div {
+    background-color: teal;
+    width: 200px;
+    margin: auto;
+    text-align: center;
+    border-width: 3px;
+    border-style: solid;
+    border-color: black;
+    border-radius: 5px;
+
+    /*En este caso existe la propiedad border que puede ahorrar líneas de código si se utiliza adecuadamente por ejemplo el primer parámetro que recibe es el ancho o grosor widht el segundo parámetro es el estilo y el último parámetro que recibe es el color. 
+    border: 3px solid black;
+    border-top: 10px dotted blue;
+    border-right: 5px dashed red;
+    border-bottom: 5px double green;
+    border-left: 5px groove yellow;
+    */
+}
+
+input {
+    margin: 5px;
+    padding: 6px 9px;
+    border: none;
+    border-bottom: 1px solid teal;
+    color: teal;
+    border-radius: 3px;
+}

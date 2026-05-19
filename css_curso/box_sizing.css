@@ -1,0 +1,23 @@
+/*El box-sizing es una propiedad de css que normalmente se utiliza para afectar como funciona el modelo de caja predeterminado. Calcular el tamaño total de un elemento. */
+
+.box{
+    width: 200px;
+    height: 200px;
+    background-color: rgb(2, 105, 136);
+    margin: 10px;
+}
+
+.box-default{
+    box-sizing: content-box; /*Es el valor predeterminado, el tamaño total del elemento se calcula sumando el ancho, alto, padding y borde. */
+    padding: 20px;
+    border: 10px solid black;
+}
+
+.box-new{
+    box-sizing: border-box; /*El tamaño total del elemento se calcula sumando el ancho, alto, padding y borde, pero el ancho y alto incluyen el padding y el borde. */
+    width: 200px;
+    height: 200px;
+    background-color: teal;
+    padding: 20px;
+    border: 10px solid black;
+}

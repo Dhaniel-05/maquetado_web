@@ -1,0 +1,17 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+/*En este caso los inputs adquieren el 80% del ancho de tóda la página en caso de que estén fuera, Sin embargo si están dentro de un formulario, el ancho se ajusta según el contenedor para este caso si el formulario tiene un ancho específico de 300px los inputs tendrán el 80% de ese ancho */
+input{
+    width: 80%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+form{
+    width: 300px;
+}

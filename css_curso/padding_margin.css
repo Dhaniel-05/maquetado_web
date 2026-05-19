@@ -1,0 +1,46 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.formulario {
+    width: 27.5%; /*Se le asigna un ancho del 27.5% al formulario para poder ver la representación visual del padding a la derecha*/
+    background-color: teal; /*Se le asigna un color de fondo al formulario para poder apreciar la distancia del contenido con relación al padding*/
+
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+
+    /* Sin embargo, se pueden ahorrar líneas de código utilizando el ShortHand es decir que se escribe padding: 20px; y automáticamente toma todas las referencias de distancia del elemento.*/
+}
+
+.formulario_input {
+    width: 100%;
+    padding: 10px;
+}
+
+.form_submit {
+    width: 100%;
+    padding: 10px;
+    background-color: black;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+/*Ahora vamos a explicar el margin*/
+.box {
+    width: 200px;
+    background-color: teal;
+    padding: 50px;
+    margin: 10px; /*El margin es la distancia que hay entre el borde del elemento y los elementos que lo rodean, es decir, la distancia entre el borde del elemento y el borde de los elementos adyacentes*/
+}
+
+.big-box {
+    width: 200px;
+    background-color: teal;
+    padding: 50px;
+    margin: 40px; /*En este caso, el margin es de 40px, lo que significa que hay una distancia de 40px entre el borde del elemento y los elementos adyacentes*/
+}
