@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Recibo Green & Blue - PDF Corregido</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 10mm 12mm;
+        }
+        
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #1a252f;
+            background-color: #f4f9fd;
+        }
+
+        /* CONTENEDOR DEL BOTÓN EXTERNO */
+        .header-actions {
+            width: 100%;
+            max-width: 1050px;
+            margin: 0 auto 15px auto;
+            text-align: right;
+        }
+
+        .btn-download {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 11pt;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+            transition: background 0.2s;
+        }
+
+        .btn-download:hover {
+            background-color: #1b5e20;
+        }
+
+        /* DISEÑO GENERAL DEL RECIBO */
+        .receipt-page {
+            background-color: #d0e8f8; 
+            width: 100%;
+            max-width: 1050px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #90caf9;
+            border-radius: 4px;
+        }
+
+        /* ENCABEZADO */
+        .header-table {
+            display: table;
+            width: 100%;
+            border-bottom: 2px solid #1565c0;
+            padding-bottom: 8px;
+        }
+
+        .header-left {
+            display: table-cell;
+            width: 60%;
+            vertical-align: top;
+        }
+
+        .logo-title {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 28pt;
+            font-weight: 900;
+            line-height: 1;
+            margin: 0;
+        }
+        .logo-title .green { color: #2e7d32; }
+        .logo-title .amp { color: #1565c0; font-family: Arial, sans-serif; margin: 0 2px; }
+        .logo-title .blue { color: #1565c0; }
+
+        .logo-sub {
+            font-family: 'Georgia', serif;
+            font-size: 15pt;
+            font-style: italic;
+            color: #00838f;
+            letter-spacing: 6px;
+            margin-top: 2px;
+        }
+
+        .logo-slogan {
+            font-size: 9.5pt;
+            color: #37474f;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        .header-right {
+            display: table-cell;
+            width: 40%;
+            text-align: right;
+            vertical-align: top;
+        }
+
+        .services-grid {
+            display: inline-block;
+            text-align: left;
+            font-size: 9pt;
+            font-weight: bold;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        .service-item {
+            display: inline-block;
+            margin-left: 12px;
+            white-space: nowrap;
+        }
+
+        .service-item input[type="checkbox"] {
+            margin-left: 4px;
+            vertical-align: middle;
+            transform: scale(1.1);
+        }
+
+        .phone-line {
+            margin-top: 8px;
+            font-size: 10.5pt;
+            color: #0d47a1;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        /* INFORMACIÓN DEL CLIENTE */
+        .info-container {
+            margin-top: 10px;
+        }
+
+        .info-row {
+            display: table;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .info-cell {
+            display: table-cell;
+            vertical-align: bottom;
+        }
+
+        .info-label {
+            font-size: 10.5pt;
+            font-weight: bold;
+            color: #2c3e50;
+            padding-right: 5px;
+            white-space: nowrap;
+        }
+
+        .info-input-wrapper {
+            width: 100%;
+        }
+
+        .info-input {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid #1565c0;
+            background: transparent;
+            font-size: 11pt;
+            color: #000;
+            padding: 2px 5px;
+            outline: none;
+        }
+
+        /* SECCIÓN DE FECHAS Y RECIBO */
+        .meta-row {
+            display: table;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .dates-section {
+            display: table-cell;
+            width: 65%;
+            vertical-align: middle;
+        }
+
+        .date-box-group {
+            display: inline-block;
+            margin-right: 25px;
+            vertical-align: middle;
+        }
+
+        .date-label {
+            font-size: 8.5pt;
+            font-weight: bold;
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .date-inputs {
+            display: inline-block;
+        }
+
+        .date-field {
+            width: 24px;
+            height: 20px;
+            border: 1px solid #1565c0;
+            background: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            font-size: 10pt;
+            font-weight: bold;
+            margin-right: -1px;
+            outline: none;
+        }
+
+        .receipt-section {
+            display: table-cell;
+            width: 35%;
+            text-align: right;
+            vertical-align: middle;
+        }
+
+        .receipt-badge {
+            display: inline-block;
+            border: 2px solid #d32f2f;
+            border-radius: 6px;
+            padding: 3px 12px;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .receipt-badge span {
+            color: #d32f2f;
+            font-weight: bold;
+            font-size: 10pt;
+            margin-right: 5px;
+        }
+
+        .receipt-badge input {
+            border: none;
+            background: transparent;
+            color: #d32f2f;
+            font-size: 12pt;
+            font-weight: bold;
+            width: 60px;
+            text-align: center;
+            outline: none;
+        }
+
+        /* TABLA PRINCIPAL */
+        .main-grid {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            border: 1px solid #1565c0;
+        }
+
+        .main-grid th {
+            background-color: rgba(21, 101, 192, 0.1);
+            border: 1px solid #1565c0;
+            font-weight: bold;
+            font-size: 11pt;
+            padding: 6px;
+            text-align: center;
+            color: #1565c0;
+        }
+
+        .content-row td {
+            border: 1px solid #1565c0;
+            vertical-align: top;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .obs-container-cell {
+            padding: 10px;
+            height: 140px;
+        }
+
+        .obs-title-label {
+            font-weight: bold;
+            font-size: 10pt;
+            color: #1565c0;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .fillable-textarea {
+            width: 100%;
+            height: 105px;
+            border: none;
+            background: transparent;
+            resize: none;
+            font-size: 11pt;
+            font-family: Arial, sans-serif;
+            outline: none;
+        }
+
+        .value-textarea {
+            width: 100%;
+            height: 130px;
+            border: none;
+            background: transparent;
+            font-size: 12pt;
+            text-align: right;
+            padding: 10px;
+            font-weight: bold;
+            outline: none;
+            font-family: Arial, sans-serif;
+            resize: none;
+        }
+
+        /* FILA DEL TOTAL */
+        .total-box-wrapper {
+            display: table;
+            width: 22%;
+            float: right;
+            border: 1px solid #1565c0;
+            background-color: rgba(255, 255, 255, 0.6);
+            margin-top: -1px;
+        }
+
+        .total-label-cell {
+            display: table-cell;
+            width: 45%;
+            background-color: rgba(21, 101, 192, 0.15);
+            font-weight: bold;
+            font-size: 10.5pt;
+            text-align: center;
+            vertical-align: middle;
+            border-right: 1px solid #1565c0;
+            padding: 6px 0;
+            color: #1565c0;
+        }
+
+        .total-value-cell {
+            display: table-cell;
+            width: 55%;
+            vertical-align: middle;
+            padding-left: 6px;
+        }
+
+        .total-value-cell span {
+            font-weight: bold;
+            font-size: 11pt;
+            color: #1565c0;
+        }
+
+        .total-input-field {
+            width: 75%;
+            border: none;
+            background: transparent;
+            font-size: 12pt;
+            font-weight: bold;
+            color: #2c3e50;
+            outline: none;
+        }
+
+        /* PIE DE FIRMAS */
+        .footer-signatures {
+            margin-top: 65px; 
+            width: 100%;
+            display: table;
+        }
+
+        .signature-block {
+            display: table-cell;
+            width: 50%;
+            text-align: center;
+            padding: 0 50px;
+            vertical-align: bottom;
+        }
+
+        .signature-line {
+            border-bottom: 1px solid #1565c0;
+            margin-bottom: 6px;
+            width: 100%;
+        }
+
+        .signature-text {
+            font-size: 9pt;
+            font-weight: bold;
+            color: #2c3e50;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-actions">
+        <button class="btn-download" onclick="descargarReciboPDF()">📥 Descargar PDF</button>
+    </div>
+
+    <div class="receipt-page" id="recibo-contenido">
+        
+        <div class="header-table">
+            <div class="header-left">
+                <h1 class="logo-title">
+                    <span class="green">GREEN</span><span class="amp">&</span><span class="blue">BLUE</span>
+                </h1>
+                <div class="logo-sub">aquamarine</div>
+                <div class="logo-slogan">Efecto y prevención en la funcionalidad física</div>
+            </div>
+            
+            <div class="header-right">
+                <div class="services-grid">
+                    <div class="service-item">REHABILITACIÓN <input type="checkbox"></div>
+                    <div class="service-item">ENTRETENIMIENTO <input type="checkbox"></div>
+                    <br>
+                    <div class="service-item" style="margin-top: 5px;">MASAJES <input type="checkbox"></div>
+                    <div class="service-item" style="margin-top: 5px;">NATACIÓN <input type="checkbox"></div>
+                </div>
+                <div class="phone-line">📞 318 868 8008 / 310 740 6038</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 12px;">
+            <div class="meta-row">
+                <div class="dates-section">
+                    <div class="date-box-group">
+                        <span class="date-label">Fecha Inicio</span>
+                        <div class="date-inputs">
+                            <input type="text" class="date-field" maxlength="2"><input type="text" class="date-field" maxlength="2"><input type="text" class="date-field" maxlength="2">
+                        </div>
+                    </div>
+                    <div class="date-box-group">
+                        <span class="date-label">Fecha Finalización</span>
+                        <div class="date-inputs">
+                            <input type="text" class="date-field" maxlength="2"><input type="text" class="date-field" maxlength="2"><input type="text" class="date-field" maxlength="2">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="receipt-section">
+                    <div class="receipt-badge">
+                        <span>RECIBO Nº</span>
+                        <input type="text" value="0481">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-container">
+            <div class="info-row">
+                <div class="info-cell" style="width: 100%;">
+                    <div style="display: flex; align-items: flex-end;">
+                        <span class="info-label">Señor (es):</span>
+                        <div class="info-input-wrapper"><input type="text" class="info-input"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-row" style="margin-top: 5px;">
+                <div class="info-cell" style="width: 33.33%; padding-right: 15px;">
+                    <div style="display: flex; align-items: flex-end;">
+                        <span class="info-label">Teléfono:</span>
+                        <div class="info-input-wrapper"><input type="text" class="info-input"></div>
+                    </div>
+                </div>
+                <div class="info-cell" style="width: 33.33%; padding-right: 15px;">
+                    <div style="display: flex; align-items: flex-end;">
+                        <span class="info-label">Ciudad:</span>
+                        <div class="info-input-wrapper"><input type="text" class="info-input"></div>
+                    </div>
+                </div>
+                <div class="info-cell" style="width: 33.34%;">
+                    <div style="display: flex; align-items: flex-end;">
+                        <span class="info-label">Dirección:</span>
+                        <div class="info-input-wrapper"><input type="text" class="info-input"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-row" style="margin-top: 8px;">
+                <div class="info-cell" style="width: 25%; padding-right: 15px;">
+                    <div style="display: flex; align-items: flex-end;">
+                        <span class="info-label">Edad:</span>
+                        <div class="info-input-wrapper"><input type="text" class="info-input"></div>
+                    </div>
+                </div>
+                <div class="info-cell" style="width: 25%; padding-right: 15px;">
+                    <div style="display: flex; align-items: flex-end;">
+                        <span class="info-label">Peso:</span>
+                        <div class="info-input-wrapper"><input type="text" class="info-input"></div>
+                    </div>
+                </div>
+                <div class="info-cell" style="width: 25%; padding-right: 15px;">
+                    <div style="display: flex; align-items: flex-end;">
+                        <span class="info-label">Talla:</span>
+                        <div class="info-input-wrapper"><input type="text" class="info-input"></div>
+                    </div>
+                </div>
+                <div class="info-cell" style="width: 25%;">
+                    <div style="display: flex; align-items: flex-end;">
+                        <span class="info-label">PPL:</span>
+                        <div class="info-input-wrapper"><input type="text" class="info-input"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <table class="main-grid">
+            <thead>
+                <tr>
+                    <th style="width: 78%;">DESCRIPCIÓN</th>
+                    <th style="width: 22%;">VR. TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="content-row">
+                    <td class="obs-container-cell">
+                        <textarea class="fillable-textarea" placeholder="Escriba aquí la descripción..."></textarea>
+                        
+                        <div style="border-top: 1px solid #1565c0; margin-top: 5px; padding-top: 5px;">
+                            <span class="obs-title-label">OBSERVACIONES:</span>
+                            <textarea class="fillable-textarea" style="height: 40px;" placeholder="Escriba observaciones adicionales aquí..."></textarea>
+                        </div>
+                    </td>
+                    <td>
+                        <textarea id="vrTotalInput" class="value-textarea" placeholder="0"></textarea>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="width: 100%; overflow: hidden;">
+            <div class="total-box-wrapper">
+                <div class="total-label-cell">TOTAL</div>
+                <div class="total-value-cell">
+                    <span>$</span>
+                    <input type="text" id="totalOutput" class="total-input-field" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-signatures">
+            <div class="signature-block">
+                <div class="signature-line"></div>
+                <span class="signature-text">FIRMA DEL INSTRUCTOR</span>
+            </div>
+            <div class="signature-block">
+                <div class="signature-line"></div>
+                <span class="signature-text">FIRMA DEL USUARIO</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. OPERACIÓN DE SUMA AUTOMÁTICA
+        const vrTotalInput = document.getElementById('vrTotalInput');
+        const totalOutput = document.getElementById('totalOutput');
+
+        vrTotalInput.addEventListener('input', () => {
+            const texto = vrTotalInput.value;
+            const valores = texto.split(/[\n\s+]+/);
+            let sumaTotal = 0;
+            
+            valores.forEach(val => {
+                let numeroLimpio = val.replace(/[^0-9]/g, '');
+                if (numeroLimpio) {
+                    sumaTotal += parseInt(numeroLimpio, 10);
+                }
+            });
+
+            if (sumaTotal > 0) {
+                totalOutput.value = sumaTotal.toLocaleString('es-CO');
+            } else {
+                totalOutput.value = '';
+            }
+        });
+
+        // 2. FUNCIÓN DE DESCARGA PDF CORREGIDA (Para que no salga en blanco)
+        function descargarReciboPDF() {
+            // SOLUCIÓN CLAVE: Guardamos el contenido escrito directamente en el atributo HTML interno
+            // para que la librería html2pdf pueda leer los textos rellenos de forma nativa.
+            
+            document.querySelectorAll('input[type="text"]').forEach(input => {
+                input.setAttribute('value', input.value);
+            });
+            
+            document.querySelectorAll('textarea').forEach(textarea => {
+                textarea.textContent = textarea.value;
+            });
+            
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                if (checkbox.checked) {
+                    checkbox.setAttribute('checked', 'checked');
+                } else {
+                    checkbox.removeAttribute('checked');
+                }
+            });
+
+            const elementoRecibo = document.getElementById('recibo-contenido');
+            
+            // Opciones de renderizado de alta calidad sin pérdidas
+            const opciones = {
+                margin:       [10, 10, 10, 10],
+                filename:     'recibo_green_and_blue.pdf',
+                image:        { type: 'jpeg', quality: 1.0 },
+                html2canvas:  { 
+                    scale: 3,             // Aumentamos escala para máxima nitidez de letras
+                    useCORS: true, 
+                    logging: false,
+                    letterRendering: true
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+
+            // Ejecuta el renderizado y guarda
+            html2pdf().set(opciones).from(elementoRecibo).save();
+        }
+    </script>
+
+</body>
+</html>

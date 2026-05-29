@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Recibo Green & Blue Aquamarine - Base de Datos Integrada</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A4 landscape;
+            margin: 10mm;
+        }
+
+        body {
+            margin: 0;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            color: #2b5e3a; 
+            font-size: 9.5pt;
+            background-color: #f4f6f9;
+            -webkit-print-color-adjust: exact;
+        }
+
+        /* CONTENEDOR PRINCIPAL DEL RECIBO */
+        .receipt-container {
+            width: 100%;
+            max-width: 265mm;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 2px solid #1e62a1;
+            border-radius: 4px;
+            padding: 25px;
+            position: relative;
+        }
+
+        /* ESTRUCTURA DEL ENCABEZADO */
+        .header-table-master {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .brand-column {
+            width: 45%;
+            vertical-align: top;
+        }
+
+        .info-column {
+            width: 55%;
+            vertical-align: top;
+        }
+
+        /* LOGOTIPO */
+        .logo-main {
+            font-size: 34pt;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .color-green { color: #5cb85c; }
+        .color-blue { color: #1e62a1; }
+
+        .ampersand {
+            color: #5cb85c;
+            font-size: 30pt;
+            margin: 0 2px;
+        }
+
+        .logo-sub {
+            font-size: 18pt;
+            font-style: italic;
+            color: #43b5a0;
+            font-weight: bold;
+            letter-spacing: 4px;
+            margin: 2px 0 6px 0;
+        }
+
+        .slogan {
+            font-size: 8pt;
+            color: #1e62a1;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        /* SECCIÓN DERECHA: SERVICIOS Y FILA DE CONTROL */
+        .services-flex-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 8pt;
+            font-weight: bold;
+            color: #5cb85c;
+            margin-bottom: 5px;
+        }
+
+        .service-item {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .checkbox-functional {
+            width: 13px;
+            height: 13px;
+            border: 1.5px solid #1e62a1;
+            margin-left: 5px;
+            cursor: pointer;
+            accent-color: #1e62a1;
+        }
+
+        .phone-row {
+            font-size: 10.5pt;
+            color: #1e62a1;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* FILA DE FECHAS Y RECIBO */
+        .control-row-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .date-input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-title {
+            font-size: 9pt;
+            font-weight: bold;
+            color: #5cb85c;
+            line-height: 1;
+        }
+
+        .date-grid-box {
+            display: flex;
+            border: 1.5px solid #1e62a1;
+            background: #fff;
+        }
+
+        .date-input-cell {
+            width: 24px;
+            height: 22px;
+            border: none;
+            border-right: 1.5px solid #1e62a1;
+            text-align: center;
+            font-size: 9.5pt;
+            font-weight: bold;
+            color: #333;
+            padding: 0;
+            outline: none;
+        }
+
+        .date-input-cell:last-child {
+            border-right: none;
+        }
+
+        /* RECIBO */
+        .recibo-flow-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-left: 15px;
+        }
+
+        .recibo-text-top {
+            font-size: 9pt;
+            font-weight: bold;
+            color: #5cb85c;
+            margin-bottom: 4px;
+        }
+
+        .recibo-line-bottom {
+            border-bottom: 1.5px solid #1e62a1;
+            padding-bottom: 2px;
+            font-size: 12pt;
+            font-weight: bold;
+            color: #1e62a1;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+        }
+
+        .recibo-input-num {
+            color: #d9534f;
+            font-size: 13pt;
+            font-weight: bold;
+            border: none;
+            width: 55px;
+            padding: 0;
+            margin-left: 5px;
+            outline: none;
+            background: transparent;
+        }
+
+        /* CAMPOS DE USUARIO */
+        .user-data-container {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .field-line {
+            display: flex;
+            width: 100%;
+            margin-bottom: 12px;
+            align-items: flex-end;
+        }
+
+        .input-label {
+            font-weight: bold;
+            color: #5cb85c;
+            font-size: 10pt;
+            white-space: nowrap;
+            padding-right: 5px;
+        }
+
+        .input-functional-line {
+            flex-grow: 1;
+            border: none;
+            border-bottom: 1.5px solid #1e62a1;
+            font-size: 10pt;
+            font-weight: bold;
+            color: #333;
+            padding: 0 5px;
+            outline: none;
+            background: transparent;
+        }
+
+        /* TABLA PRINCIPAL */
+        .grid-invoice {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .grid-invoice th {
+            border: 2px solid #1e62a1;
+            padding: 8px;
+            font-size: 11pt;
+            font-weight: bold;
+            color: #5cb85c;
+            text-align: center;
+        }
+
+        .textarea-description {
+            width: 100%;
+            height: 200px;
+            border: none;
+            border-left: 2px solid #1e62a1;
+            border-right: 2px solid #1e62a1;
+            resize: none;
+            padding: 8px;
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            color: #333;
+            outline: none;
+        }
+
+        .input-vr-total {
+            width: 140px;
+            height: 200px;
+            border: none;
+            border-right: 2px solid #1e62a1;
+            text-align: right;
+            padding: 8px;
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            font-weight: bold;
+            color: #333;
+            outline: none;
+            resize: none;
+        }
+
+        .textarea-observations {
+            width: 100%;
+            height: 65px;
+            border: 2px solid #1e62a1;
+            padding: 8px;
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+            font-weight: bold;
+            color: #333;
+            outline: none;
+            resize: none;
+        }
+
+        /* CUADRO TOTAL */
+        .total-box-table {
+            width: 140px;
+            margin-left: auto;
+            border-collapse: collapse;
+            margin-top: -2px;
+        }
+
+        .total-box-label {
+            border-left: 2px solid #1e62a1;
+            border-right: 2px solid #1e62a1;
+            border-bottom: 2px solid #1e62a1;
+            text-align: center;
+            font-weight: bold;
+            font-size: 11pt;
+            color: #5cb85c;
+            padding: 6px;
+            width: 70px;
+            background: #fff;
+        }
+
+        .total-box-value-cell {
+            border-right: 2px solid #1e62a1;
+            border-bottom: 2px solid #1e62a1;
+            padding: 0 6px;
+            width: 70px;
+            background: #fff;
+            position: relative;
+        }
+
+        .currency-sign {
+            color: #1e62a1;
+            font-weight: bold;
+            font-size: 11pt;
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .input-total-final {
+            width: 100%;
+            border: none;
+            text-align: right;
+            font-size: 11pt;
+            font-weight: bold;
+            color: #1e62a1;
+            outline: none;
+            padding: 6px 0;
+            background: transparent;
+        }
+
+        /* FIRMAS INFERIORES */
+        .signatures-container-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 45px;
+        }
+
+        .signatures-container-table td {
+            width: 50%;
+            text-align: center;
+            padding: 0 55px;
+        }
+
+        .base-line {
+            border-top: 1.5px solid #1e62a1;
+            margin-bottom: 5px;
+        }
+
+        .legend-text {
+            font-size: 9pt;
+            font-weight: bold;
+            color: #5cb85c;
+            letter-spacing: 0.5px;
+        }
+
+        /* BOTÓN DE ENVIAR / GUARDAR */
+        .action-panel {
+            max-width: 265mm;
+            margin: 15px auto 0 auto;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-submit {
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 11pt;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background 0.2s;
+        }
+
+        .btn-submit:hover {
+            background-color: #4cae4c;
+        }
+
+        /* Ocultar botones e interfaz innecesaria al imprimir */
+        @media print {
+            body { background-color: #fff; padding: 0; }
+            .receipt-container { border: 2px solid #1e62a1; box-shadow: none; }
+            input, textarea { background: transparent !important; }
+            .action-panel { display: none; }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+<div class="receipt-container">
+
+    <table class="header-table-master">
+        <tr>
+            <td class="brand-column">
+                <h1 class="logo-main">
+                    <span class="color-green">GREEN</span>
+                    <span class="ampersand">&amp;</span>
+                    <span class="color-blue">BLUE</span>
+                </h1>
+                <div class="logo-sub">aquamarine</div>
+                <p class="slogan">Efecto y prevención en la funcionalidad física</p>
+            </td>
+
+            <td class="info-column">
+                <div class="services-flex-row">
+                    <label class="service-item">REHABILITACIÓN <input type="checkbox" id="chk-rehab" class="checkbox-functional"></label>
+                    <label class="service-item">ENTRETENIMIENTO <input type="checkbox" id="chk-entre" class="checkbox-functional"></label>
+                    <label class="service-item">MASAJES <input type="checkbox" id="chk-masajes" class="checkbox-functional"></label>
+                    <label class="service-item">NATACIÓN <input type="checkbox" id="chk-natacion" class="checkbox-functional"></label>
+                </div>
+
+                <div class="phone-row">
+                    💬 318 868 8008 / 310 740 6038
+                </div>
+
+                <div class="control-row-container">
+                    <div class="date-input-group">
+                        <span class="date-title">Fecha<br>Inicio</span>
+                        <div class="date-grid-box">
+                            <input type="text" id="fi-dia" class="date-input-cell" maxlength="2" placeholder="DD">
+                            <input type="text" id="fi-mes" class="date-input-cell" maxlength="2" placeholder="MM">
+                            <input type="text" id="fi-ano" class="date-input-cell" maxlength="2" placeholder="AA">
+                        </div>
+                    </div>
+                    
+                    <div class="date-input-group">
+                        <span class="date-title">Fecha<br>Finalización</span>
+                        <div class="date-grid-box">
+                            <input type="text" id="ff-dia" class="date-input-cell" maxlength="2" placeholder="DD">
+                            <input type="text" id="ff-mes" class="date-input-cell" maxlength="2" placeholder="MM">
+                            <input type="text" id="ff-ano" class="date-input-cell" maxlength="2" placeholder="AA">
+                        </div>
+                    </div>
+
+                    <div class="recibo-flow-box">
+                        <span class="recibo-text-top">RECIBO</span>
+                        <div class="recibo-line-bottom">No <input type="text" id="recibo-num" class="recibo-input-num" value="0481" maxlength="6"></div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="user-data-container">
+        <div class="field-line">
+            <span class="input-label" style="width: 8%;">Señor (es):</span>
+            <input type="text" id="txt-cliente" class="input-functional-line" style="width: 54%;">
+            <div style="width: 3%;"></div>
+            <span class="input-label" style="width: 8%;">Dirección:</span>
+            <input type="text" id="txt-direccion" class="input-functional-line" style="width: 27%;">
+        </div>
+        
+        <div class="field-line">
+            <span class="input-label" style="width: 7%;">Teléfono:</span>
+            <input type="text" id="txt-telefono" class="input-functional-line" style="width: 17%;">
+            <div style="width: 2%;"></div>
+            <span class="input-label" style="width: 6%;">Ciudad:</span>
+            <input type="text" id="txt-ciudad" class="input-functional-line" style="width: 17%;">
+            <div style="width: 2%;"></div>
+            <span class="input-label" style="width: 5%;">Edad:</span>
+            <input type="text" id="txt-edad" class="input-functional-line" style="width: 10%;">
+            <div style="width: 2%;"></div>
+            <span class="input-label" style="width: 5%;">Peso:</span>
+            <input type="text" id="txt-peso" class="input-functional-line" style="width: 10%;">
+            <div style="width: 2%;"></div>
+            <span class="input-label" style="width: 5%;">Talla:</span>
+            <input type="text" id="txt-talla" class="input-functional-line" style="width: 8%;">
+            <div style="width: 2%;"></div>
+            <span class="input-label" style="width: 4%;">PPL:</span>
+            <input type="text" id="txt-ppl" class="input-functional-line" style="width: 6%;">
+        </div>
+    </div>
+
+    <table class="grid-invoice">
+        <thead>
+            <tr>
+                <th>DESCRIPCIÓN</th>
+                <th style="width: 140px;">VR. TOTAL</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="padding: 0;">
+                    <textarea id="txt-descripcion" class="textarea-description" placeholder="Escribe la descripción aquí..."></textarea>
+                </td>
+                <td style="padding: 0;">
+                    <textarea id="input-valores" class="input-vr-total" placeholder="0"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="padding: 0;">
+                    <textarea id="txt-observaciones" class="textarea-observations" placeholder="OBSERVACIONES:"></textarea>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="total-box-table">
+        <tr>
+            <td class="total-box-label">TOTAL</td>
+            <td class="total-box-value-cell">
+                <span class="currency-sign">$</span>
+                <input type="text" id="total-final" class="input-total-final" value="0" readonly>
+            </td>
+        </tr>
+    </table>
+
+    <table class="signatures-container-table">
+        <tr>
+            <td>
+                <div class="base-line"></div>
+                <div class="legend-text">FIRMA DEL INSTRUCTOR</div>
+            </td>
+            <td>
+                <div class="base-line"></div>
+                <div class="legend-text">FIRMA DEL USUARIO</div>
+            </td>
+        </tr>
+    </table>
+
+</div>
+
+<div class="action-panel">
+    <button type="button" class="btn-submit" id="btn-guardar">Guardar y Enviar Recibo</button>
+</div>
+
+<script>
+    // 1. LÓGICA DE SUMA EN TIEMPO REAL
+    const inputValores = document.getElementById('input-valores');
+    const totalFinal = document.getElementById('total-final');
+
+    inputValores.addEventListener('input', () => {
+        const lineas = inputValores.value.split('\n');
+        let sumaTotal = 0;
+        lineas.forEach(linea => {
+            const numeroLimpio = linea.replace(/[^0-9.]/g, '');
+            const valor = parseFloat(numeroLimpio);
+            if (!isNaN(valor)) { sumaTotal += valor; }
+        });
+        totalFinal.value = sumaTotal.toLocaleString('es-CO');
+    });
+
+    // 2. LÓGICA DE LA BASE DE DATOS (IndexedDB)
+    let db;
+    // Abrir (o crear) la base de datos GreenBlueDB versión 1
+    const request = indexedDB.open("GreenBlueDB", 1);
+
+    // Se ejecuta si la base de datos se está creando por primera vez
+    request.onupgradeneeded = (e) => {
+        db = e.target.result;
+        // Creamos una tabla llamada "recibos" cuyo identificador único será el número de recibo
+        if (!db.objectStoreNames.contains("recibos")) {
+            db.createObjectStore("recibos", { keyPath: "idRecibo" });
+        }
+    };
+
+    request.onsuccess = (e) => {
+        db = e.target.result;
+        console.log("Base de datos conectada exitosamente.");
+    };
+
+    request.onerror = (e) => {
+        console.error("Error abriendo la base de datos:", e.target.error);
+    };
+
+    // Al hacer clic en el botón Guardar
+    // --- NUEVO CÓDIGO PARA PDF ---
+document.getElementById('btn-guardar').addEventListener('click', () => {
+    // Seleccionamos todo el contenedor del recibo
+    const elemento = document.querySelector('.receipt-container');
+    const idRecibo = document.getElementById('recibo-num').value.trim();
+
+    const opciones = {
+        margin:       5,
+        filename:     'Recibo_' + (idRecibo || 'SinNumero') + '.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+    };
+
+    // Generar y descargar el PDF
+    html2pdf().set(opciones).from(elemento).save();
+});
+
+        // Empaquetar todos los datos estructurados del formulario
+        const datosRecibo = {
+            idRecibo: idRecibo,
+            servicios: {
+                rehabilitacion: document.getElementById('chk-rehab').checked,
+                entretenimiento: document.getElementById('chk-entre').checked,
+                masajes: document.getElementById('chk-masajes').checked,
+                natacion: document.getElementById('chk-natacion').checked
+            },
+            fechaInicio: `${document.getElementById('fi-dia').value}/${document.getElementById('fi-mes').value}/${document.getElementById('fi-ano').value}`,
+            fechaFinal: `${document.getElementById('ff-dia').value}/${document.getElementById('ff-mes').value}/${document.getElementById('ff-ano').value}`,
+            cliente: document.getElementById('txt-cliente').value,
+            direccion: document.getElementById('txt-direccion').value,
+            telefono: document.getElementById('txt-telefono').value,
+            ciudad: document.getElementById('txt-ciudad').value,
+            edad: document.getElementById('txt-edad').value,
+            peso: document.getElementById('txt-peso').value,
+            talla: document.getElementById('txt-talla').value,
+            ppl: document.getElementById('txt-ppl').value,
+            descripcion: document.getElementById('txt-descripcion').value,
+            valores: document.getElementById('input-valores').value,
+            observaciones: document.getElementById('txt-observaciones').value,
+            total: totalFinal.value,
+            fechaRegistro: new Date().toLocaleString()
+        };
+
+        // Iniciar una transacción de escritura en la tabla "recibos"
+        const transaction = db.transaction(["recibos"], "readwrite");
+        const store = transaction.objectStore("recibos");
+        const agregarRequest = store.put(datosRecibo); // .put guarda o sobrescribe si el ID ya existe
+
+        agregarRequest.onsuccess = () => {
+            alert(`¡Recibo Nº ${idRecibo} guardado con éxito en la base de datos local!`);
+            console.log("Datos almacenados:", datosRecibo);
+        };
+
+        agregarRequest.onerror = (e) => {
+            alert("Hubo un error al intentar guardar el recibo.");
+            console.error(e.target.error);
+        };
+    ;
+</script>
+
+</body>
+</html>

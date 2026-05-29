@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Recibo – GREEN & BLUE aquamarine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Satisfy&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --green: #3a6645;
+      --blue:  #174e70;
+      --red:   #8c2c36;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    body {
+      background: #dde3e8;
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 20px 40px;
+      gap: 12px;
+      min-height: 100vh;
+    }
+ 
+    /* ── TOOLBAR (outside receipt, hidden on print) ── */
+    .toolbar {
+      width: 860px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    .tbtn {
+      padding: 7px 20px;
+      border: none;
+      border-radius: 5px;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    .tbtn:hover { opacity: .82; }
+    .tbtn-print { background: var(--blue); color: #fff; }
+    .tbtn-clear { background: #a33; color: #fff; }
+ 
+    /* ── RECEIPT ── */
+    .receipt {
+      background: #fff;
+      width: 860px;
+      padding: 16px 20px 20px;
+      box-shadow: 0 3px 16px rgba(0,0,0,.18);
+      border: 1px solid #bbb;
+    }
+ 
+    /* ── HEADER ── */
+    .hdr {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+    }
+ 
+    /* Logo column */
+    .logo-col { min-width: 215px; display: flex; flex-direction: column; }
+    .logo-title {
+      font-family: 'Architects Daughter', cursive;
+      font-size: 34px;
+      line-height: 1;
+      letter-spacing: .5px;
+    }
+    .lg { color: var(--green); }
+    .lb { color: var(--blue);  }
+    .logo-sub {
+      font-family: 'Satisfy', cursive;
+      font-size: 24px;
+      color: var(--green);
+      margin-top: -5px;
+      letter-spacing: 1.5px;
+    }
+    .logo-slogan {
+      font-size: 10px;
+      color: var(--blue);
+      margin-top: 5px;
+      font-style: italic;
+    }
+ 
+    /* Center column */
+    .ctr-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding-top: 2px;
+    }
+ 
+    /* Services row */
+    .svc-row { display: flex; gap: 10px; align-items: center; }
+    .svc {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 12px; font-weight: 700; color: var(--green);
+      cursor: pointer; user-select: none;
+    }
+    .svc input[type="checkbox"] { display: none; }
+    .svc-box {
+      width: 13px; height: 13px;
+      border: 1.5px solid var(--blue);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 10px; color: var(--blue); font-weight: 900;
+    }
+    .svc input:checked ~ .svc-box::after { content: '✓'; }
+ 
+    /* Phone */
+    .phone { font-size: 13px; font-weight: 700; color: var(--blue); }
+ 
+    /* Dates */
+    .dates-row { display: flex; gap: 18px; align-items: center; }
+    .dg { display: flex; align-items: center; gap: 5px; }
+    .dlbl { font-size: 11.5px; font-weight: 700; color: var(--green); text-align: right; line-height: 1.25; }
+    .dboxes { display: flex; }
+    .dinput {
+      width: 28px; height: 22px;
+      border: 1.5px solid var(--blue); border-right: none;
+      text-align: center; font-size: 11px;
+      font-family: 'Lato', sans-serif;
+      color: var(--blue); background: transparent; outline: none; padding: 0;
+    }
+    .dinput:last-child { border-right: 1.5px solid var(--blue); width: 36px; }
+    .dinput:focus { background: #eef3ff; }
+ 
+    /* Receipt number column */
+    .rno-col {
+      display: flex; flex-direction: column; align-items: flex-end;
+      gap: 3px; min-width: 130px; padding-top: 4px;
+    }
+    .rno-lbl { font-size: 12.5px; font-weight: 700; color: var(--green); letter-spacing: 2px; }
+    .rno-box {
+      border: 2px solid var(--blue); border-radius: 18px;
+      padding: 3px 14px;
+      display: flex; align-items: center; gap: 3px;
+    }
+    .rno-n { font-size: 13px; font-weight: 700; color: var(--red); }
+    .rno-inp {
+      width: 58px; font-size: 20px; font-weight: 700; color: var(--red);
+      font-family: 'Lato', sans-serif; border: none; outline: none;
+      background: transparent; text-align: center; letter-spacing: 2px;
+    }
+ 
+    /* ── DIVIDER ── */
+    .divider { border: none; border-top: 1px solid var(--blue); margin: 6px 0 4px; }
+ 
+    /* ── CLIENT FIELDS ── */
+    .cfields { display: flex; flex-direction: column; gap: 4px; }
+    .crow { display: flex; align-items: flex-end; gap: 4px; }
+    .clbl { font-size: 13px; color: var(--green); white-space: nowrap; padding-bottom: 1px; }
+    .cinp {
+      flex-grow: 1;
+      border: none; border-bottom: 1px solid var(--blue);
+      outline: none; background: transparent;
+      font-family: 'Lato', sans-serif; font-size: 13px; font-weight: 400; color: #1a1a1a;
+      padding: 0 2px 1px; min-width: 20px;
+    }
+    .cinp:focus { background: #f0f6ff; border-bottom-color: var(--green); }
+    .w-lg  { max-width: 290px; }
+    .w-med { max-width: 120px; }
+    .w-sm  { max-width: 80px;  }
+    .w-xs  { max-width: 52px;  }
+ 
+    /* ── MAIN TABLE ── */
+    .mtable {
+      border: 1.5px solid var(--blue);
+      margin-top: 8px;
+      display: flex; flex-direction: column;
+    }
+ 
+    /* Header */
+    .mth { display: flex; border-bottom: 1.5px solid var(--blue); }
+    .mth-desc {
+      flex: 1; padding: 5px 8px;
+      font-size: 14px; font-weight: 700; color: var(--green); text-align: center;
+    }
+    .mth-val {
+      width: 155px; padding: 5px 8px;
+      font-size: 14px; font-weight: 700; color: var(--green); text-align: center;
+      border-left: 1.5px solid var(--blue);
+    }
+ 
+    /* Body rows */
+    .mbody { display: flex; flex-direction: column; }
+    .mrow {
+      display: flex;
+      border-bottom: 1px solid #c5d5e0;
+      min-height: 34px;
+    }
+    .mrow:last-child { border-bottom: none; }
+    .mrow-desc {
+      flex: 1; display: flex; align-items: center;
+    }
+    .mrow-val {
+      width: 155px; border-left: 1.5px solid var(--blue);
+      display: flex; align-items: center; gap: 3px; padding: 0 8px;
+    }
+    .mdinp {
+      flex: 1; border: none; outline: none;
+      font-family: 'Lato', sans-serif; font-size: 13px; font-weight: 300; color: #1a1a1a;
+      background: transparent; padding: 6px 8px; height: 100%; width: 100%;
+    }
+    .mdinp:focus { background: #f5faff; }
+    .mvinp {
+      flex: 1; border: none; outline: none;
+      font-family: 'Lato', sans-serif; font-size: 13px; font-weight: 300; color: #1a1a1a;
+      background: transparent; text-align: right; padding: 0; width: 100%;
+    }
+    .mvinp:focus { background: #f5faff; }
+    .vpfx { font-size: 11px; color: var(--blue); flex-shrink: 0; }
+ 
+    /* Observations */
+    .mobs { display: flex; border-top: 1.5px solid var(--blue); }
+    .mobs-left { flex: 1; padding: 6px 8px; display: flex; flex-direction: column; gap: 3px; }
+    .mobs-lbl { font-size: 13px; font-weight: 700; color: var(--green); }
+    .mobs-ta {
+      flex: 1; border: none; outline: none; resize: none;
+      font-family: 'Lato', sans-serif; font-size: 13px; font-weight: 300; color: #1a1a1a;
+      background: transparent; min-height: 55px; padding: 2px 0;
+    }
+    .mobs-ta:focus { background: #f5faff; }
+    .mobs-right { width: 155px; border-left: 1.5px solid var(--blue); }
+ 
+    /* Total row */
+    .mtotal { display: flex; justify-content: flex-end; border-top: 1.5px solid var(--blue); }
+    .mtotal-lbl { padding: 6px 12px; font-size: 14px; font-weight: 700; color: var(--green); display: flex; align-items: center; }
+    .mtotal-val {
+      width: 155px; border-left: 1.5px solid var(--blue);
+      padding: 6px 10px; font-size: 16px; font-weight: 700; color: var(--blue);
+      display: flex; align-items: center; gap: 4px;
+    }
+    #total-out { font-size: 14px; font-weight: 400; color: var(--blue); }
+ 
+    /* ── FOOTER ── */
+    .footer { display: flex; justify-content: space-around; margin-top: 48px; }
+    .sigblock { display: flex; flex-direction: column; align-items: center; width: 200px; }
+    .sigline { width: 100%; border-top: 1.5px solid var(--blue); margin-bottom: 5px; }
+    .siglbl { font-size: 14px; font-weight: 700; color: var(--green); letter-spacing: .4px; }
+ 
+    /* ── PRINT ── */
+    @media print {
+      body { background: #fff; padding: 0; }
+      .toolbar { display: none !important; }
+      .receipt { box-shadow: none; border: none; width: 100%; }
+      input, textarea { background: transparent !important; }
+    }
+  </style>
+</head>
+<body>
+ 
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <button class="tbtn tbtn-clear" onclick="clearAll()">🗑 Limpiar</button>
+  <button class="tbtn tbtn-print" onclick="window.print()">🖨 Imprimir / PDF</button>
+</div>
+ 
+<div class="receipt">
+ 
+  <!-- ══ HEADER ══ -->
+  <div class="hdr">
+ 
+    <!-- Logo -->
+    <div class="logo-col">
+      <div class="logo-title">
+        <span class="lg">GREEN</span><span class="lg">&</span><span class="lb">BLUE</span>
+      </div>
+      <div class="logo-sub">aquamarine</div>
+      <div class="logo-slogan">Efecto y prevención en la funcionalidad física</div>
+    </div>
+ 
+    <!-- Center -->
+    <div class="ctr-col">
+      <!-- Services -->
+      <div class="svc-row">
+        <label class="svc"><input type="checkbox"/><span class="svc-box"></span>REHABILITACIÓN</label>
+        <label class="svc"><input type="checkbox"/><span class="svc-box"></span>ENTRETENIMIENTO</label>
+        <label class="svc"><input type="checkbox"/><span class="svc-box"></span>MASAJES</label>
+        <label class="svc"><input type="checkbox"/><span class="svc-box"></span>NATACIÓN</label>
+      </div>
+      <!-- Phone -->
+      <div class="phone">⊙ 318 868 8008 / 310 740 6038</div>
+      <!-- Dates -->
+      <div class="dates-row">
+        <div class="dg">
+          <div class="dlbl">Fecha<br>Inicio</div>
+          <div class="dboxes">
+            <input class="dinput" type="text" maxlength="2" placeholder="DD" data-next="fi-m" id="fi-d"/>
+            <input class="dinput" type="text" maxlength="2" placeholder="MM" data-next="fi-y" id="fi-m"/>
+            <input class="dinput" type="text" maxlength="4" placeholder="AAAA" id="fi-y"/>
+          </div>
+        </div>
+        <div class="dg">
+          <div class="dlbl">Fecha<br>Finalización</div>
+          <div class="dboxes">
+            <input class="dinput" type="text" maxlength="2" placeholder="DD" data-next="ff-m" id="ff-d"/>
+            <input class="dinput" type="text" maxlength="2" placeholder="MM" data-next="ff-y" id="ff-m"/>
+            <input class="dinput" type="text" maxlength="4" placeholder="AAAA" id="ff-y"/>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- Receipt number -->
+    <div class="rno-col">
+      <div class="rno-lbl">RECIBO</div>
+      <div class="rno-box">
+        <span class="rno-n">N&ordm;</span>
+        <input class="rno-inp" type="text" id="rno" value="0479" maxlength="6"/>
+      </div>
+    </div>
+ 
+  </div><!-- /hdr -->
+ 
+  <hr class="divider"/>
+ 
+  <!-- ══ CLIENT FIELDS ══ -->
+  <div class="cfields">
+    <div class="crow">
+      <span class="clbl">Señor (es):</span>
+      <input class="cinp w-lg" type="text" id="f-nombre"/>
+      <span class="clbl">Dirección:</span>
+      <input class="cinp" type="text" id="f-dir"/>
+    </div>
+    <div class="crow">
+      <span class="clbl">Teléfono:</span>
+      <input class="cinp w-med" type="tel" id="f-tel"/>
+      <span class="clbl">Ciudad:</span>
+      <input class="cinp w-sm" type="text" id="f-ciudad"/>
+      <span class="clbl">Edad:</span>
+      <input class="cinp w-xs" type="text" maxlength="3" id="f-edad"/>
+      <span class="clbl">Peso:</span>
+      <input class="cinp w-xs" type="text" maxlength="6" id="f-peso"/>
+      <span class="clbl">Talla:</span>
+      <input class="cinp w-xs" type="text" maxlength="5" id="f-talla"/>
+      <span class="clbl">PPL:</span>
+      <input class="cinp w-xs" type="text" maxlength="6" id="f-ppl"/>
+    </div>
+  </div>
+ 
+  <!-- ══ MAIN TABLE ══ -->
+  <div class="mtable">
+ 
+    <!-- Header -->
+    <div class="mth">
+      <div class="mth-desc">DESCRIPCIÓN</div>
+      <div class="mth-val">VR. TOTAL</div>
+    </div>
+ 
+    <!-- Body rows (7 fixed lines) -->
+    <div class="mbody" id="mbody"></div>
+ 
+    <!-- Observations -->
+    <div class="mobs">
+      <div class="mobs-left">
+        <div class="mobs-lbl">OBSERVACIONES</div>
+        <textarea class="mobs-ta" id="f-obs" placeholder=""></textarea>
+      </div>
+      <div class="mobs-right"></div>
+    </div>
+ 
+    <!-- Total -->
+    <div class="mtotal">
+      <div class="mtotal-lbl">TOTAL</div>
+      <div class="mtotal-val">
+        <span>$</span>
+        <span id="total-out"></span>
+      </div>
+    </div>
+ 
+  </div>
+ 
+  <!-- ══ FOOTER ══ -->
+  <div class="footer">
+    <div class="sigblock">
+      <div class="sigline"></div>
+      <div class="siglbl">FIRMA DEL INSTRUCTOR</div>
+    </div>
+    <div class="sigblock">
+      <div class="sigline"></div>
+      <div class="siglbl">FIRMA DEL USUARIO</div>
+    </div>
+  </div>
+ 
+</div><!-- /receipt -->
+ 
+<script>
+  // ── Date auto-advance ──────────────────────────
+  document.querySelectorAll('.dinput').forEach(inp => {
+    inp.addEventListener('input', () => {
+      if (inp.value.length >= parseInt(inp.maxLength)) {
+        const nextId = inp.dataset.next;
+        if (nextId) document.getElementById(nextId).focus();
+      }
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && inp.value === '') {
+        const prev = inp.previousElementSibling;
+        if (prev && prev.classList.contains('dinput')) prev.focus();
+      }
+    });
+  });
+ 
+  // ── Build body rows ────────────────────────────
+  const NUM_ROWS = 7;
+  function buildRows() {
+    const body = document.getElementById('mbody');
+    body.innerHTML = '';
+    for (let i = 1; i <= NUM_ROWS; i++) {
+      const row = document.createElement('div');
+      row.className = 'mrow';
+      row.innerHTML = `
+        <div class="mrow-desc">
+          <input class="mdinp" type="text" placeholder="" id="d-desc-${i}"/>
+        </div>
+        <div class="mrow-val">
+          <input class="mvinp" type="text" placeholder="" id="d-val-${i}" inputmode="decimal" oninput="recalc()"/>
+        </div>`;
+      body.appendChild(row);
+    }
+  }
+ 
+  // ── Recalculate total ──────────────────────────
+  function recalc() {
+    let sum = 0;
+    for (let i = 1; i <= NUM_ROWS; i++) {
+      const el = document.getElementById('d-val-' + i);
+      if (el) {
+        const n = parseFloat(el.value.replace(/[^0-9.]/g, ''));
+        if (!isNaN(n)) sum += n;
+      }
+    }
+    const out = document.getElementById('total-out');
+    out.textContent = sum > 0
+      ? sum.toLocaleString('es-CO', { minimumFractionDigits: 0 })
+      : '';
+  }
+ 
+  // Format on blur / unformat on focus
+  document.addEventListener('blur', e => {
+    if (e.target.classList.contains('mvinp')) {
+      const n = parseFloat(e.target.value.replace(/[^0-9.]/g, ''));
+      if (!isNaN(n) && n > 0)
+        e.target.value = n.toLocaleString('es-CO', { minimumFractionDigits: 0 });
+      recalc();
+    }
+  }, true);
+  document.addEventListener('focus', e => {
+    if (e.target.classList.contains('mvinp'))
+      e.target.value = e.target.value.replace(/\./g, '').replace(/,/g, '');
+  }, true);
+ 
+  // ── Clear all ─────────────────────────────────
+  function clearAll() {
+    if (!confirm('¿Borrar todos los datos del recibo?')) return;
+    document.querySelectorAll('input[type="text"], input[type="tel"], textarea')
+      .forEach(el => { if (el.id !== 'rno') el.value = ''; });
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+    recalc();
+  }
+ 
+  // ── Init ──────────────────────────────────────
+  buildRows();
+</script>
+</body>
+</html>
